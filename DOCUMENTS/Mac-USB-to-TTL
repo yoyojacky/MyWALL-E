@@ -1,0 +1,18 @@
+PL2303 Serial USB on OSX Lion
+24 Jul 2011
+Heres a way to get you PL2303-based Serial-USB adapter working with OS X Lion (10.7) or OS X Mountain Lion (10.8). Based on the osx-pl2303 project on github, Ive built a kernel extension that works with OS X Lion or OS X Mountain Lion. You can grab the kext file here or from the link below.
+Installing the kext file can be done in a few easy steps:
+
+$ download and extract
+$ cd /path/to/osx-pl2303.kext
+$ sudo cp -R osx-pl2303.kext /System/Library/Extensions/
+$ next you need to fix permissions and execute bits:
+$ cd /System/Library/Extensions
+$ sudo chmod -R 755 osx-pl2303.kext
+$ sudo chown -R root:wheel osx-pl2303.kext
+$ cd /System/Library/Extensions
+$ sudo kextload ./osx-pl2303.kext
+$ sudo kextcache -system-cache
+
+Good luck!
+http://www.xbsd.nl/pub/osx-pl2303.kext.tgz
