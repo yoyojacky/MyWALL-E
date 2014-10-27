@@ -7,7 +7,7 @@ void setup()
 
 void loop()
   {
-    Serial.println("Hello Pi, This is arduino UNO speaking..." 
+    Serial.println("Hello Pi, This is arduino UNO speaking..." ）；
     if(Serial.available())
       {
         flash(Serial.read() - '0');
