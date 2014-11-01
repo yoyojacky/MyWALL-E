@@ -1,0 +1,246 @@
+//命名字符串和对应的ACII值
+#define _US 0x5553 
+#define _DS 0x4453
+#define _LS 0x4C53
+#define _RS 0x5253
+#define _UL 0x554C
+#define _DL 0x444C
+#define _UR 0x5552
+#define _DR 0x4452
+#define _SS 0x5353
+ 
+#define ENA 10
+#define ENB 11
+#define IN1 7
+#define IN2 8
+#define IN3 12
+#define IN4 13
+ 
+#define LOWSPEED 100
+//前后左右时候的速度，可以调为其他值
+#define HIGHSPEED 255
+//转弯的时候的速度，可以调为其他值
+ 
+#define IN1_HIGH        PORTE |=0x40
+#define IN1_LOW                PORTE &=~0x40
+#define IN2_HIGH        PORTB |=0x10
+#define IN2_LOW                PORTB &=~0x10
+#define IN3_HIGH        PORTD |=0x40
+#define IN3_LOW                PORTD &=~0x40
+#define IN4_HIGH        PORTC |=0x80
+#define IN4_LOW                PORTC &=~0x80
+#define ENA_HIGH        PORTB |=0x40
+#define ENA_LOW                PORTB &=~0x40
+#define ENB_HIGH        PORTB |=0x80
+#define ENB_LOW                PORTB &=~0x80
+ 
+uint16_t value;
+ 
+uint8_t r_buffer[4];
+ 
+uint8_t number;
+uint8_t command;
+ 
+ 
+void setup(){
+        pinMode(ENA,OUTPUT);
+        pinMode(ENB,OUTPUT);
+        pinMode(IN1,OUTPUT);
+        pinMode(IN2,OUTPUT);
+        pinMode(IN3,OUTPUT);
+        pinMode(IN4,OUTPUT);
+        //ENA_HIGH;   
+        //ENB_HIGH 
+ 
+ 
+       run(0);
+ 
+ 
+Serial1.begin(9600);
+ 
+}
+ 
+void loop(){
+ 
+        if(Serial1.available())
+        {
+                uint8_t readbuf = Serial1.read();
+                r_buffer[number]=readbuf;
+                number++;
+ 
+                if(readbuf==0x3B) //此处是结束符，3B对应的ACII值是分号
+                {        
+                        if(number==3)
+                        {
+                                value = (r_buffer[0]<<8) | (r_buffer[1]);
+                        }
+                        number=0;
+                        command=1;
+ 
+                }
+ 
+ 
+ 
+        }
+ 
+ 
+ 
+        if(command)
+        {
+                command=0;
+                switch(value)
+                {
+                          case _SS:        run(0);break; //对应9个运动方向
+                        case _US:        run(1);break;
+                        case _DS:        run(2);break;
+                        case _LS:        run(3);break;
+                        case _RS:        run(4);break;
+                        case _UL:        run(5);break;
+                        case _UR:        run(6);break;
+                        case _DL:        run(7);break;
+                        case _DR:        run(8);break;
+ 
+ 
+                }
+ 
+ 
+        }
+ 
+ 
+ 
+ 
+ 
+}
+ 
+ 
+ 
+void forward()
+{
+        ENA_HIGH; 
+        ENB_HIGH;
+        IN1_HIGH; 
+        IN2_LOW;
+        IN3_HIGH; 
+        IN4_LOW; 
+}
+ 
+void backward()
+{
+        ENA_HIGH; 
+        ENB_HIGH;
+        IN1_LOW; 
+        IN2_HIGH;
+        IN3_LOW; 
+        IN4_HIGH; 
+}
+ 
+void turnleft()
+{
+        ENA_HIGH; 
+        ENB_HIGH;
+        IN1_LOW; 
+        IN2_LOW;
+        IN3_HIGH; 
+        IN4_LOW; 
+}
+ 
+void turnright()
+{
+        ENA_HIGH; 
+        ENB_HIGH;
+        IN1_HIGH; 
+        IN2_LOW;
+        IN3_LOW; 
+        IN4_LOW; 
+}
+ 
+void stopcar()
+{
+        ENA_LOW; 
+        ENB_LOW;
+        IN1_LOW; 
+        IN2_LOW;
+        IN3_LOW; 
+        IN4_LOW; 
+}
+ 
+void run(int direct)
+{
+        switch(direct)
+        {
+                case 0: 
+                                IN1_LOW; 
+                                IN2_LOW;
+                                IN3_LOW; 
+                                IN4_LOW; 
+                                analogWrite(ENA,0);
+                                analogWrite(ENB,0);
+                                break;
+                case 1: 
+                                IN1_HIGH; 
+                                IN2_LOW;
+                                IN3_HIGH; 
+                                IN4_LOW; 
+                                analogWrite(ENA,LOWSPEED);
+                                analogWrite(ENB,LOWSPEED);
+                                break;
+                case 2:
+                                IN1_LOW; 
+                                IN2_HIGH;
+                                IN3_LOW; 
+                                IN4_HIGH; 
+                                analogWrite(ENA,LOWSPEED);
+                                analogWrite(ENB,LOWSPEED);
+                                break;                
+                case 3:
+                                IN1_LOW; 
+                                IN2_LOW;
+                                IN3_HIGH; 
+                                IN4_LOW; 
+                                analogWrite(ENA,LOWSPEED);
+                                analogWrite(ENB,LOWSPEED);
+                                break;                
+                case 4:
+                                IN1_HIGH; 
+                                IN2_LOW;
+                                IN3_LOW; 
+                                IN4_LOW; 
+                                analogWrite(ENA,LOWSPEED);
+                                analogWrite(ENB,LOWSPEED);
+                                break;        
+                case 5: 
+                                IN1_HIGH; 
+                                IN2_LOW;
+                                IN3_HIGH; 
+                                IN4_LOW; 
+                                analogWrite(ENA,LOWSPEED);
+                                analogWrite(ENB,HIGHSPEED);
+                                break;
+                case 6:
+                                IN1_HIGH; 
+                                IN2_LOW;
+                                IN3_HIGH; 
+                                IN4_LOW; 
+                                analogWrite(ENA,HIGHSPEED);
+                                analogWrite(ENB,LOWSPEED);
+                                break;                
+                case 7:
+                                IN1_LOW; 
+                                IN2_HIGH;
+                                IN3_LOW; 
+                                IN4_HIGH; 
+                                analogWrite(ENA,LOWSPEED);
+                                analogWrite(ENB,HIGHSPEED);
+                                break;                
+                case 8:
+                                IN1_LOW; 
+                                IN2_HIGH;
+                                IN3_LOW; 
+                                IN4_HIGH; 
+                                analogWrite(ENA,HIGHSPEED);
+                                analogWrite(ENB,LOWSPEED);
+                                break;                
+ 
+        }
+ 
+}
